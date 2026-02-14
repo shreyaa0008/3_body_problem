@@ -14,6 +14,12 @@ class MissionSplitMoneyScreen extends StatefulWidget {
 class MissionSplitMoneyScreenState
     extends State<MissionSplitMoneyScreen> {
   String? selected;
+  bool showSplitSlider = false;
+  double splitPercentage = 0.5; // 50% to each category
+  final double totalAmount = 2000;
+  
+  double get essentialsAmount => totalAmount * splitPercentage;
+  double get funAmount => totalAmount * (1 - splitPercentage);
 
   @override
   Widget build(BuildContext context) {
@@ -71,25 +77,184 @@ class MissionSplitMoneyScreenState
                       ),
                     ),
                     SizedBox(height: 30),
-                    Center(
-                      child: Container(
-                         padding: EdgeInsets.symmetric(vertical: 12, horizontal: 30),
-                         decoration: BoxDecoration(
-                           color: Color(0xFF6C63FF),
-                           borderRadius: BorderRadius.circular(16),
-                         ),
-                         child: Text(
-                           "₹2000",
-                           style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
-                         ),
+                    GestureDetector(
+                      onLongPress: () {
+                        setState(() {
+                          showSplitSlider = true;
+                        });
+                      },
+                      child: Center(
+                        child: Container(
+                           padding: EdgeInsets.symmetric(vertical: 12, horizontal: 30),
+                           decoration: BoxDecoration(
+                             color: Color(0xFF6C63FF),
+                             borderRadius: BorderRadius.circular(16),
+                           ),
+                           child: Text(
+                             "₹${totalAmount.toStringAsFixed(0)}",
+                             style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
+                           ),
+                        ),
                       ),
                     ),
+                    if (showSplitSlider) ...[
+                      SizedBox(height: 20),
+                      Container(
+                        padding: EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Color(0xFF6C63FF), width: 1.5),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.05),
+                              blurRadius: 10,
+                              offset: Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                              "Drag to split your money",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF6C63FF),
+                              ),
+                            ),
+                            SizedBox(height: 16),
+                            GestureDetector(
+                              onHorizontalDragUpdate: (details) {
+                                setState(() {
+                                  splitPercentage += details.delta.dx / 200;
+                                  splitPercentage = splitPercentage.clamp(0.0, 1.0);
+                                });
+                              },
+                              child: Container(
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(4),
+                                  color: Colors.grey.shade200,
+                                ),
+                                child: Stack(
+                                  children: [
+                                    Container(
+                                      height: 8,
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(4),
+                                        color: Colors.grey.shade200,
+                                      ),
+                                    ),
+                                    Container(
+                                      height: 8,
+                                      width: (splitPercentage * 100).clamp(0, 100).toDouble() + 100,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(4),
+                                        color: Color(0xFF6C63FF),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      left: (splitPercentage * 200) - 12,
+                                      top: -6,
+                                      child: GestureDetector(
+                                        onHorizontalDragUpdate: (details) {
+                                          setState(() {
+                                            splitPercentage += details.delta.dx / 200;
+                                            splitPercentage = splitPercentage.clamp(0.0, 1.0);
+                                          });
+                                        },
+                                        child: Container(
+                                          width: 24,
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Color(0xFF6C63FF),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withValues(alpha: 0.2),
+                                                blurRadius: 4,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 16),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Essentials",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                    SizedBox(height: 4),
+                                    Text(
+                                      "₹${essentialsAmount.toStringAsFixed(0)}",
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      "Fun",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                    SizedBox(height: 4),
+                                    Text(
+                                      "₹${funAmount.toStringAsFixed(0)}",
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 16),
+                            ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  showSplitSlider = false;
+                                });
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(0xFF6C63FF),
+                              ),
+                              child: Text("Done Splitting", style: TextStyle(color: Colors.white)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                     SizedBox(height: 30),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        _buildChoice("Essentials", selected == "Essentials"),
-                        _buildChoice("Fun", selected == "Fun"),
+                        _buildChoice("Essentials", selected == "Essentials", essentialsAmount),
+                        _buildChoice("Fun", selected == "Fun", funAmount),
                       ],
                     ),
                     SizedBox(height: 30),
@@ -135,7 +300,7 @@ class MissionSplitMoneyScreenState
      );
   }
 
-  Widget _buildChoice(String label, bool isSelected) {
+  Widget _buildChoice(String label, bool isSelected, double amount) {
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -148,20 +313,30 @@ class MissionSplitMoneyScreenState
           border: Border.all(
             color: isSelected ? Colors.black87 : Colors.black45,
             width: 1.5,
-            style: BorderStyle.solid // Dashed is hard in flutter perfectly without package, using solid for now or custom painter if strict. Design looks like dashed.
+            style: BorderStyle.solid
           ),
           borderRadius: BorderRadius.circular(12),
-          // For dashed effect we need a custom painter or package (dotted_border).
-          // Using solid for simplicity unless strictly required.
-          // Wait, the design shows dashed. I'll stick to solid for now to minimize deps.
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
+        child: Column(
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            SizedBox(height: 4),
+            Text(
+              "₹${amount.toStringAsFixed(0)}",
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF6C63FF),
+              ),
+            ),
+          ],
         ),
       ),
     );
