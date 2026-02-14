@@ -179,25 +179,37 @@ class _MissionChangeRunnerScreenState extends State<MissionChangeRunnerScreen> {
                   SizedBox(height: 4),
                   Text(
                     "Goal: Identifying the correct currency notes/coins to pay for an item quickly.",
-                    style: TextStyle(fontSize: 12, color: Color(0xFF6C63FF)),
+                    style: TextStyle(fontSize: 14, color: Color(0xFF6C63FF)),
                   ),
                   SizedBox(height: 30),
                   
                   // Timer
                   Center(
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                       decoration: BoxDecoration(
-                        color: Color(0xFF8F94FB),
-                        borderRadius: BorderRadius.circular(16),
+                        gradient: LinearGradient(
+                           colors: [Color(0xFF6C63FF), Color(0xFF8F94FB)],
+                           begin: Alignment.topLeft,
+                           end: Alignment.bottomRight
+                        ),
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0xFF6C63FF).withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: Offset(0, 4),
+                          )
+                        ]
                       ),
                       child: Text(
                         "$minutes:$seconds",
                         style: TextStyle(
-                          fontSize: 32, 
+                          fontSize: 36, 
                           fontWeight: FontWeight.bold, 
                           color: Colors.white,
-                          fontFamily: 'Courier', // Monospace for timer look
+                          fontFamily: 'Courier', 
+                          letterSpacing: 2.0
                         ),
                       ),
                     ),

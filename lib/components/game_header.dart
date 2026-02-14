@@ -42,21 +42,29 @@ class GameHeader extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        )
+                      ],
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.currency_rupee, size: 16, color: Color(0xFF6C63FF)),
+                        Icon(Icons.currency_rupee, size: 18, color: Color(0xFF6C63FF)),
+                        SizedBox(width: 4),
                         Text(
                           "$coinBalance",
                           style: TextStyle(
                             color: Color(0xFF6C63FF),
                             fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                            fontSize: 16,
                           ),
                         ),
                       ],

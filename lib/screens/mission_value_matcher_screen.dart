@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../components/game_header.dart';
 import '../components/mascot_bubble.dart';
 import '../components/primary_button.dart';
+import 'level_completion_screen.dart';
 
 class MissionValueMatcherScreen extends StatefulWidget {
   final int overallBalance;
@@ -163,7 +164,21 @@ class _MissionValueMatcherScreenState extends State<MissionValueMatcherScreen> {
                _currentScenarioIndex++;
                _loadScenario();
              } else {
-               _currentScenarioIndex++; // To show game over screen
+               _currentScenarioIndex++;
+               // Navigate to Level Completion
+               Navigator.pushReplacement(
+                 context,
+                 MaterialPageRoute(
+                   builder: (_) => LevelCompletionScreen(
+                     score: 180, // Example hardcoded score based on concept or calculation
+                     totalBalance: widget.overallBalance + _score,
+                     onUnlockNext: () {
+                       // Logic to unlock next level or go back to dashboard
+                        Navigator.popUntil(context, (route) => route.isFirst);
+                     },
+                   ),
+                 ),
+               );
              }
            });
         }

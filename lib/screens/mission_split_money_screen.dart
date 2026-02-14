@@ -109,15 +109,36 @@ class _MissionSplitMoneyScreenState extends State<MissionSplitMoneyScreen> {
                   
                   if (_currentQuestionIndex < _questions.length) ...[
                     Text(
-                      "Situation: \"${question['situation']}\"",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.black87, height: 1.5),
+                      "Situation:",
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
                     ),
-                    SizedBox(height: 60),
+                    SizedBox(height: 8),
+                    Text(
+                      "\"${question['situation']}\"",
+                      style: TextStyle(fontSize: 16, height: 1.5, color: Colors.black87),
+                    ),
+                    SizedBox(height: 32),
+                    
+                    // Options
                     Row(
                       children: [
-                        Expanded(child: _buildOptionButton("WANTS", false)),
-                        SizedBox(width: 20),
-                        Expanded(child: _buildOptionButton("NEEDS", true)),
+                        Expanded(
+                          child: _buildOptionButton(
+                            "WANTS", 
+                             false, // isNeed = false
+                            Colors.white,
+                            Color(0xFF6C63FF),
+                          ),
+                        ),
+                        SizedBox(width: 16),
+                        Expanded(
+                          child: _buildOptionButton(
+                            "NEEDS", 
+                             true, // isNeed = true
+                            Colors.white,
+                            Color(0xFF6C63FF),
+                          ),
+                        ),
                       ],
                     ),
                   ] else ...[
@@ -165,21 +186,20 @@ class _MissionSplitMoneyScreenState extends State<MissionSplitMoneyScreen> {
     );
   }
 
-  Widget _buildOptionButton(String label, bool isNeed) {
-    return OutlinedButton(
+  Widget _buildOptionButton(String text, bool isNeed, Color bgColor, Color textColor) {
+    return ElevatedButton(
       onPressed: () => _handleAnswer(isNeed),
-      style: OutlinedButton.styleFrom(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: bgColor,
+        foregroundColor: textColor,
+        side: BorderSide(color: Color(0xFF6C63FF), width: 1.5),
         padding: EdgeInsets.symmetric(vertical: 16),
-        side: BorderSide(color: Color(0xFF6C63FF)),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 0,
       ),
       child: Text(
-        label,
-        style: TextStyle(
-          color: Colors.black87,
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
+        text,
+        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1.2),
       ),
     );
   }
