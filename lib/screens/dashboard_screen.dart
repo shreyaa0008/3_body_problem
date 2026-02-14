@@ -2,23 +2,31 @@ import 'package:flutter/material.dart';
 import '../components/gradient_header.dart';
 import '../components/virtual_card_widget.dart';
 import '../components/module_selector.dart';
-import '../components/mascot_bubble.dart';
-import '../components/primary_button.dart';
 import '../models/module_model.dart';
-import 'mission_split_money_screen.dart';
+import 'sections/money_basics_section.dart';
+import 'sections/banking_section.dart';
+import 'sections/commerce_section.dart';
+import 'sections/stocks_section.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    List<ModuleModel> modules = [
-      ModuleModel(title: "Money Basics", isUnlocked: true),
-      ModuleModel(title: "Banking", isUnlocked: false),
-      ModuleModel(title: "E-Commerce", isUnlocked: false),
-      ModuleModel(title: "Stocks", isUnlocked: false),
-    ];
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
 
+class _DashboardScreenState extends State<DashboardScreen> {
+  int _selectedIndex = 0;
+
+  final List<ModuleModel> _modules = [
+    ModuleModel(title: "Money Basics", isUnlocked: true),
+    ModuleModel(title: "Banking", isUnlocked: false),
+    ModuleModel(title: "E-Commerce", isUnlocked: false),
+    ModuleModel(title: "Stocks", isUnlocked: false),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -35,47 +43,17 @@ class DashboardScreen extends StatelessWidget {
                   children: [
                     VirtualCardWidget(balance: 3250),
                     SizedBox(height: 24),
-                    ModuleSelector(modules: modules),
-                    SizedBox(height: 24),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "Mission 1",
-                        style: TextStyle(
-                          color: Color(0xFF6C63FF),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "Split the Money",
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                    MascotBubble(
-                      message:
-                          "You just received ₹2000. Let's decide how to use it wisely.",
-                    ),
-                    SizedBox(height: 24),
-                    PrimaryButton(
-                      text: "Learn Money Basics",
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                MissionSplitMoneyScreen(),
-                          ),
-                        );
+                    ModuleSelector(
+                      modules: _modules,
+                      selectedIndex: _selectedIndex,
+                      onModuleSelected: (index) {
+                        setState(() {
+                          _selectedIndex = index;
+                        });
                       },
-                    )
+                    ),
+                    SizedBox(height: 24),
+                    _buildSectionContent(),
                   ],
                 ),
               ),
@@ -84,5 +62,20 @@ class DashboardScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildSectionContent() {
+    switch (_selectedIndex) {
+      case 0:
+        return MoneyBasicsSection(balance: 3250);
+      case 1:
+        return BankingSection();
+      case 2:
+        return CommerceSection();
+      case 3:
+        return StocksSection();
+      default:
+        return MoneyBasicsSection(balance: 3250);
+    }
   }
 }

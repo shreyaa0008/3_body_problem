@@ -12,44 +12,46 @@ class MascotBubble extends StatelessWidget {
       children: [
         Expanded(
           child: Container(
-            padding: EdgeInsets.all(16),
+            padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-                bottomLeft: Radius.circular(20),
+                topLeft: Radius.circular(24),
+                topRight: Radius.circular(24),
+                bottomLeft: Radius.circular(24),
                 bottomRight: Radius.circular(4),
               ),
-               boxShadow: [
+              boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 10,
-                  offset: Offset(0, 5),
+                  offset: Offset(0, 4),
                 ),
               ],
+              border: Border.all(color: Color(0xFFE0EAFC), width: 1),
             ),
             child: Text(
               message,
               style: TextStyle(
-                color: Color(0xFF6C63FF),
-                fontSize: 14,
+                color: Color(0xFF4A4A4A),
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
+                height: 1.4,
               ),
             ),
           ),
         ),
-        SizedBox(width: 12),
+        SizedBox(width: 16),
         // Local mascot asset
         Container(
-          width: 80,
-          height: 80,
+          width: 100,
+          height: 100,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Color(0xFFE0EAFC),
+            // color: Color(0xFFE0EAFC), // Removed background color to look cleaner if transparent
             image: DecorationImage(
                 image: AssetImage('assets/images/mascot.png'),
-                fit: BoxFit.cover),
+                fit: BoxFit.contain),
           ),
         ),
       ],
