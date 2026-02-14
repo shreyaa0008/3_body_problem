@@ -330,7 +330,7 @@ class _MissionChangeRunnerScreenState extends State<MissionChangeRunnerScreen> {
                      )
                   ],
 
-                  SizedBox(height: 40),
+                  SizedBox(height: 16),
                   MascotBubble(
                     message: _feedbackMessage ?? "Select the exact change!",
                   ),

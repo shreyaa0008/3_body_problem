@@ -28,6 +28,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFF5F5FA), // Off-white/light grey for glass contrast
       body: SingleChildScrollView(
         child: Column(
           children: [

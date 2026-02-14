@@ -14,7 +14,11 @@ class GradientHeader extends StatelessWidget {
     return Container(
       height: 250,
       decoration: BoxDecoration(
-        color: Color(0xFF6C63FF),
+        gradient: LinearGradient(
+          colors: [Color(0xFF5945E6), Color(0xFF8F94FB)], // Richer Blue-Purple
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
       ),
       child: Stack(

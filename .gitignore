@@ -57,3 +57,15 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
+
+# Agent & Environment
+.agent/
+.gemini/
+brain/
+*.env
+*.env.*
+.vscode/
+
+# Flutter specific (Windows)
+windows/flutter/ephemeral/
+windows/flutter/generated_plugin_registrant.cc

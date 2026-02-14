@@ -27,7 +27,7 @@ class LevelCompletionScreen extends StatelessWidget {
             currentStep: 3, // Mastered
           ),
           Expanded(
-            child: Padding(
+            child: SingleChildScrollView(
               padding: const EdgeInsets.all(24.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -77,7 +77,7 @@ class LevelCompletionScreen extends StatelessWidget {
                     ),
                   ),
                   
-                  Spacer(),
+                  SizedBox(height: 40), // Replaced Spacer with fixed spacing
                   
                   PrimaryButton(
                     text: "Unlock Banking Level for 160 Rs",

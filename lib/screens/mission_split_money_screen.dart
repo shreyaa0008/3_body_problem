@@ -5,160 +5,201 @@ import '../components/primary_button.dart';
 import 'mission_change_runner_screen.dart';
 
 class MissionSplitMoneyScreen extends StatefulWidget {
-  final int overallBalance; // User's total balance passed from dashboard
+  final int overallBalance;
 
   const MissionSplitMoneyScreen({super.key, this.overallBalance = 3250});
 
   @override
-  State<MissionSplitMoneyScreen> createState() =>
-      _MissionSplitMoneyScreenState();
+  State<MissionSplitMoneyScreen> createState() => _MissionSplitMoneyScreenState();
 }
 
 class _MissionSplitMoneyScreenState extends State<MissionSplitMoneyScreen> {
-  int _currentQuestionIndex = 0;
+  int _currentScenarioIndex = 0;
   int _score = 0;
   String? _feedbackMessage;
+  
+  // Track dropped items: "itemId" -> "targetType" (Need/Want)
+  final Map<String, String> _droppedItems = {};
 
-  // Placeholder Question Data
-  final List<Map<String, dynamic>> _questions = [
+  final List<Map<String, dynamic>> _scenarios = [
     {
-      "situation": "Ravi's bicycle tire is burst. He needs to get to the market to sell his vegetables. He has enough money for either a New Tire or a Fancy Sunglasses.",
-      "isNeed": true,
-      "correctOption": "New Tire",
-      "wrongOption": "Fancy Sunglasses"
+      "title": "Scenario 1: Daily Life",
+      "items": [
+        {"id": "s1_1", "text": "Repair Tire", "type": "Need"},
+        {"id": "s1_2", "text": "Buy Sunglasses", "type": "Want"},
+      ]
     },
     {
-      "situation": "You are thirsty after playing. You can buy a Bottle of Water or a Sugary Soda.",
-      "isNeed": true,
-       "correctOption": "Water",
-      "wrongOption": "Soda"
+      "title": "Scenario 2: Thirst Quencher",
+      "items": [
+        {"id": "s2_1", "text": "Water Bottle", "type": "Need"},
+        {"id": "s2_2", "text": "Sugary Soda", "type": "Want"},
+      ]
     },
     {
-      "situation": "You have an exam tomorrow. You can buy a Textbook you need or a Video Game.",
-      "isNeed": true,
-       "correctOption": "Textbook",
-      "wrongOption": "Video Game"
+      "title": "Scenario 3: Exam Prep",
+      "items": [
+        {"id": "s3_1", "text": "Textbook", "type": "Need"},
+        {"id": "s3_2", "text": "Video Game", "type": "Want"},
+      ]
     },
   ];
 
-  void _handleAnswer(bool choosedNeed) {
-    if (_currentQuestionIndex >= _questions.length) return;
+  void _onItemDropped(Map<String, String> item, String targetType) {
+    if (_feedbackMessage != null) return; // Wait for current feedback to clear
 
-    // For now assuming NEED is always correct in these scenarios
-    
-    if (choosedNeed) {
+    final isCorrect = item['type'] == targetType;
+
+    setState(() {
+      if (isCorrect) {
+        _droppedItems[item['id']!] = targetType;
         _score += 10;
-        _feedbackMessage = "Correct! That is a smart choice.";
-    } else {
-        _feedbackMessage = "Not quite! Remember to prioritize Needs over Wants.";
-    }
+        _feedbackMessage = "Correct! That's a $targetType.";
+        
+        // Clear success message after delay or keep until next action
+         Future.delayed(Duration(seconds: 1), () {
+           if (mounted && _feedbackMessage != null && !_isScenarioComplete()) {
+             setState(() => _feedbackMessage = null);
+           }
+         });
 
-    setState(() {});
-
-    Future.delayed(Duration(seconds: 2), () {
-      if (mounted) {
-        setState(() {
-            _currentQuestionIndex++;
-              if (_currentQuestionIndex >= _questions.length) {
-                _feedbackMessage = "Mission Completed! You scored $_score";
-              } else {
-                 _feedbackMessage = null;
-              }
+      } else {
+        _feedbackMessage = "Oops! ${item['text']} is actually a ${item['type']}.";
+        // Clear error message automatically
+        Future.delayed(Duration(seconds: 2), () {
+          if (mounted) setState(() => _feedbackMessage = null);
         });
       }
     });
+
+    if (_isScenarioComplete()) {
+       Future.delayed(Duration(seconds: 1), _nextScenario);
+    }
+  }
+
+  bool _isScenarioComplete() {
+     if (_currentScenarioIndex >= _scenarios.length) return true;
+     final items = _scenarios[_currentScenarioIndex]['items'] as List;
+     // Check if all items for this scenario are in droppedItems
+     return items.every((item) => _droppedItems.containsKey(item['id']));
+  }
+
+  void _nextScenario() {
+    if (mounted) {
+      setState(() {
+        if (_currentScenarioIndex < _scenarios.length) {
+          _currentScenarioIndex++;
+          // Keep droppedItems history? Or clear for new level? 
+          // Since IDs are unique across scenarios, we don't strictly *need* to clear, 
+          // but clearing keeps map small.
+          // However, to animate out, we might want to keep them for a moment.
+          // For simplicity, we just move index.
+        }
+        _feedbackMessage = null;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final question = _currentQuestionIndex < _questions.length 
-        ? _questions[_currentQuestionIndex] 
-        : _questions.last;
+    bool isGameFinished = _currentScenarioIndex >= _scenarios.length;
+    final currentScenario = !isGameFinished ? _scenarios[_currentScenarioIndex] : null;
 
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          // Use the GameHeader with the overall balance + current score
           GameHeader(
             title: "Money Basics",
-            coinBalance: widget.overallBalance + _score, 
-            currentStep: 0, // This is Mission 1: Split the Money, so step 0
+            coinBalance: widget.overallBalance + _score,
+            currentStep: 0,
           ),
           Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: ListView(
+                padding: const EdgeInsets.all(24.0),
                 children: [
-                   Text(
-                    "Mission 1",
-                    style: TextStyle(color: Color(0xFF6C63FF), fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    "Split the Money",
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    "Goal: Differentiate between Needs (Survival) and Wants (Luxury).",
-                    style: TextStyle(fontSize: 14, color: Color(0xFF6C63FF)),
-                  ),
-                  SizedBox(height: 40),
+                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                       Column(
+                         crossAxisAlignment: CrossAxisAlignment.start,
+                         children: [
+                           Text(
+                            "Mission 1",
+                            style: TextStyle(color: Color(0xFF6C63FF), fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            "Split the Money",
+                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87),
+                          ),
+                         ],
+                       ),
+                    ],
+                   ),
                   
-                  if (_currentQuestionIndex < _questions.length) ...[
-                    Text(
-                      "Situation:",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      "\"${question['situation']}\"",
-                      style: TextStyle(fontSize: 16, height: 1.5, color: Colors.black87),
-                    ),
-                    SizedBox(height: 32),
-                    
-                    // Options
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildOptionButton(
-                            "WANTS", 
-                             false, // isNeed = false
-                            Colors.white,
-                            Color(0xFF6C63FF),
-                          ),
+                  SizedBox(height: 20),
+
+                  if (!isGameFinished) ...[
+                     Text(
+                        currentScenario!['title'],
+                        style: TextStyle(fontSize: 18, color: Colors.black54),
+                      ),
+                      SizedBox(height: 30),
+                      
+                      // Draggable Items Area
+                      Center(
+                        child: Wrap(
+                          spacing: 16,
+                          runSpacing: 16,
+                          alignment: WrapAlignment.center,
+                          children: (currentScenario['items'] as List).map<Widget>((dynamic itemDyn) {
+                             final item = itemDyn as Map<String, dynamic>;
+                             final id = item['id'] as String;
+                             final text = item['text'] as String;
+
+                             final isDropped = _droppedItems.containsKey(id);
+                             if (isDropped) return SizedBox.shrink(); // Hide if dropped
+
+                             return Draggable<Map<String, String>>(
+                               data: Map<String, String>.from(item),
+                               feedback: _buildDraggableCard(text, true),
+                               childWhenDragging: Opacity(opacity: 0.3, child: _buildDraggableCard(text, false)),
+                               child: _buildDraggableCard(text, false),
+                             );
+                          }).toList(),
                         ),
-                        SizedBox(width: 16),
-                        Expanded(
-                          child: _buildOptionButton(
-                            "NEEDS", 
-                             true, // isNeed = true
-                            Colors.white,
-                            Color(0xFF6C63FF),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+
+                      SizedBox(height: 40), // Increased spacing for comfort
+                      
+                      // Drop Targets
+                      Row(
+                        children: [
+                          Expanded(child: _buildDragTarget("Want", Colors.purple.shade50)),
+                          SizedBox(width: 16),
+                          Expanded(child: _buildDragTarget("Need", Colors.blue.shade50)),
+                        ],
+                      ),
+                      
                   ] else ...[
-                     Container(
-                       padding: EdgeInsets.all(20),
-                       alignment: Alignment.center,
+                     SizedBox(height: 40),
+                      Container(
+                       padding: EdgeInsets.all(24),
                        decoration: BoxDecoration(
                          color: Color(0xFFE0EAFC),
                          borderRadius: BorderRadius.circular(16)
                        ),
                        child: Column(
                          children: [
-                           Icon(Icons.emoji_events, size: 48, color: Color(0xFF6C63FF)),
-                           SizedBox(height: 12),
-                           Text("Great Job!", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                           Text("You finished the quiz.", style: TextStyle(color: Colors.black54)),
+                           Icon(Icons.check_circle, size: 64, color: Color(0xFF6C63FF)),
+                           SizedBox(height: 16),
+                           Text("Mission Complete!", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                           SizedBox(height: 8),
+                           Text("You know how to split your money wisely.", textAlign: TextAlign.center),
                          ],
-                        ),
+                       ),
                      ),
-                     SizedBox(height: 20),
+                     SizedBox(height: 40),
                      PrimaryButton(
                         text: "Go to Mission 2",
                         onPressed: () {
@@ -170,37 +211,88 @@ class _MissionSplitMoneyScreenState extends State<MissionSplitMoneyScreen> {
                            );
                         },
                       ),
-
+                      SizedBox(height: 20),
                   ],
-
-                  SizedBox(height: 60),
+                  
+                  SizedBox(height: 16),
                   MascotBubble(
-                    message: _feedbackMessage ?? "Select the correct category to help Ravi!",
+                    message: _feedbackMessage ?? "Drag items to 'Wants' or 'Needs'!",
                   ),
                 ],
               ),
-            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildOptionButton(String text, bool isNeed, Color bgColor, Color textColor) {
-    return ElevatedButton(
-      onPressed: () => _handleAnswer(isNeed),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: bgColor,
-        foregroundColor: textColor,
-        side: BorderSide(color: Color(0xFF6C63FF), width: 1.5),
-        padding: EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 0,
+  Widget _buildDraggableCard(String text, bool isDragging) {
+    return Material(
+      color: Colors.transparent,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Color(0xFF6C63FF), width: 1.5),
+          boxShadow: [
+             BoxShadow(
+              color: Colors.black.withValues(alpha: isDragging ? 0.2 : 0.05),
+              blurRadius: isDragging ? 12 : 4,
+              offset: Offset(0, 4),
+            )
+          ]
+        ),
+        child: Text(
+          text,
+          style: TextStyle(
+            fontSize: 16, 
+            fontWeight: FontWeight.bold, 
+            color: Colors.black87
+          ),
+        ),
       ),
-      child: Text(
-        text,
-        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1.2),
-      ),
+    );
+  }
+
+  Widget _buildDragTarget(String type, Color bgColor) {
+    return DragTarget<Map<String, String>>(
+      onWillAcceptWithDetails: (details) => true,
+      onAcceptWithDetails: (details) => _onItemDropped(details.data, type),
+      builder: (context, candidateData, rejectedData) {
+        bool isHovered = candidateData.isNotEmpty;
+        return Container(
+          height: 120, // Fixed height for targets
+          decoration: BoxDecoration(
+            color: isHovered ? bgColor.withValues(alpha: 0.8) : bgColor,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isHovered ? Color(0xFF6C63FF) : Colors.transparent,
+              width: 2
+            ),
+          ),
+          alignment: Alignment.center,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                type == "Want" ? Icons.favorite_border : Icons.shield_outlined,
+                size: 32,
+                color: Color(0xFF6C63FF),
+              ),
+              SizedBox(height: 8),
+              Text(
+                "${type}s",
+                style: TextStyle(
+                  fontSize: 18, 
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF6C63FF)
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

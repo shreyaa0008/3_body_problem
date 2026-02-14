@@ -20,7 +20,7 @@ class _MissionValueMatcherScreenState extends State<MissionValueMatcherScreen> {
   
   // Game State
   String? _selectedId;
-  Set<String> _matchedIds = {};
+  final Set<String> _matchedIds = {};
   Set<String> _errorIds = {}; // Items to flash red
   bool _isProcessing = false; // Prevent double taps during animation
 
@@ -287,7 +287,7 @@ class _MissionValueMatcherScreenState extends State<MissionValueMatcherScreen> {
                   ],
 
                   if (!isGameOver) ...[
-                    SizedBox(height: 40),
+                    SizedBox(height: 16),
                     MascotBubble(
                       message: _errorIds.isNotEmpty 
                         ? "Oops! Those don't match." 

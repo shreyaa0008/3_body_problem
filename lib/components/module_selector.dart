@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import '../models/module_model.dart';
 
 class ModuleSelector extends StatelessWidget {
@@ -15,20 +16,25 @@ class ModuleSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: Offset(0, 5),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.6), // Increased transparency
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.6), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 15,
+                offset: Offset(0, 8),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Row(
+          child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: modules.asMap().entries.map((entry) {
           int idx = entry.key;
@@ -46,7 +52,7 @@ class ModuleSelector extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: isSelected
-                        ? Color(0xFFE0EAFC)
+                        ? Color(0xFF6C63FF).withValues(alpha: 0.1)
                         : Colors.transparent,
                     border: isSelected
                         ? Border.all(color: Color(0xFF6C63FF).withValues(alpha: 0.3), width: 1)
@@ -87,6 +93,8 @@ class ModuleSelector extends StatelessWidget {
             ),
           );
         }).toList(),
+      ),
+        ),
       ),
     );
   }
